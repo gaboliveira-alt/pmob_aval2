@@ -30,7 +30,14 @@ Aplicativo móvel em Flutter para divulgação e consulta de objetos perdidos e 
 
 ## Serviços em nuvem
 
-<!-- TODO: definir o serviço de armazenamento (ex.: Firebase Firestore, Supabase) e documentar chaves/URLs de configuração -->
+- **Supabase** (plano gratuito, sem autenticação) — tabela `public.items` com
+  políticas de RLS que permitem apenas `SELECT` e `INSERT` para o papel `anon`.
+- A URL do projeto e a `publishable key` (chave pública por design — a antiga
+  `anon key`) ficam em
+  [`lib/config/supabase_config.dart`](lib/config/supabase_config.dart) e são
+  obtidas em **Settings → API** do painel do Supabase (item 8.2 do edital).
+- O schema do banco está em [`docs/supabase/schema.sql`](docs/supabase/schema.sql)
+  e deve ser executado no **SQL Editor** do Supabase.
 
 ## Como executar
 
@@ -42,10 +49,12 @@ Aplicativo móvel em Flutter para divulgação e consulta de objetos perdidos e 
 
 ```bash
 flutter pub get
-flutter run
+flutter run -d chrome
 ```
 
-<!-- TODO: documentar a configuração das credenciais do serviço em nuvem (arquivos de configuração, chaves/URLs) antes de executar -->
+> Antes de executar, preencha `url` e `publishKey` em
+> [`lib/config/supabase_config.dart`](lib/config/supabase_config.dart) com os
+> valores reais do projeto Supabase (**Settings → API**).
 
 ## Estrutura do projeto
 
