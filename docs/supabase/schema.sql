@@ -1,9 +1,3 @@
--- ============================================================================
--- Achados e Perdidos — UESPI | Schema do Supabase (RF05)
--- Execute este script completo no SQL Editor do Supabase (plano gratuito).
--- ============================================================================
-
--- Tabela principal de registros (perdidos e encontrados)
 create table if not exists public.items (
   id          uuid primary key default gen_random_uuid(),
   name        text not null check (char_length(btrim(name)) between 1 and 60),
@@ -13,10 +7,8 @@ create table if not exists public.items (
   created_at  timestamptz not null default now()
 );
 
--- Listagem deve apresentar os registros mais recentes primeiro (RF01)
 create index if not exists items_created_at_idx on public.items (created_at desc);
 
--- App sem autenticação: apenas leitura e inserção pelo papel anon (seção 5 do edital)
 alter table public.items enable row level security;
 
 create policy "anon can select items"

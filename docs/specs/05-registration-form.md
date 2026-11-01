@@ -28,7 +28,7 @@ Validator pattern (applied to all):
 ```dart
 validator: (value) {
   if (value == null || value.trim().isEmpty) {
-    return 'Informe o nome do objeto'; // 'Informe a descrição' / 'Informe o local'
+    return 'Informe o nome do objeto';
   }
   if (value.trim().length > 60) {
     return 'Use no máximo 60 caracteres';
@@ -46,7 +46,7 @@ validator: (value) {
 ```dart
 Future<void> _submit() async {
   final form = _formKey.currentState;
-  if (form == null || !form.validate()) return; // validate before submitting
+  if (form == null || !form.validate()) return;
 
   final controller = context.read<ItemsController>();
   final success = await controller.submitItem(

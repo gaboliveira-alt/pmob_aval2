@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-/// Root widget of the application: Material 3 theme and pt-BR localization.
 class App extends StatelessWidget {
   const App({super.key});
 
@@ -20,8 +19,6 @@ class App extends StatelessWidget {
   }
 }
 
-/// Provisional screen shown while the real screens are not implemented.
-/// It is replaced by the listing screen in Stage 4.
 class _HomePlaceholder extends StatelessWidget {
   const _HomePlaceholder();
 

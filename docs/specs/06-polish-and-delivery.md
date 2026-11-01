@@ -26,7 +26,8 @@ Rules to check in code review:
 - [ ] Clear layer separation: `presentation/` (UI), `domain/models` (models),
       `data/` (data access) — no `Supabase` imported directly by the UI.
 - [ ] No `print()` (use `debugPrint` only if needed, and no leftovers).
-- [ ] No remaining TODO/demo comments (the old counter demo was already replaced).
+- [ ] No comments in code (`//`, `///`, `/* */`) and no TODO/demo leftovers
+      (the old counter demo was already replaced).
 
 ## 2. UI and usability (RNF01)
 
@@ -44,7 +45,7 @@ Update the existing `README.md`:
       Adonias Pereira dos Santos Terceiro — **confirm with the team**).
 - [x] Feature description (already present; adjust if needed).
 - [ ] **Cloud service**: replace the TODO with "Supabase (free plan)",
-      explaining: project URL, public anon key in
+      explaining: project URL, public publishable key in
       `lib/config/supabase_config.dart`, script `docs/supabase/schema.sql`,
       RLS policies of SELECT/INSERT for the `anon` role (item 8.2: keys/URLs
       must be available in the repository).
@@ -59,8 +60,8 @@ Update the existing `README.md`:
 - [ ] Ensure `build/`, `.dart_tool/`, `*.apk`, `*.aab`, `*.ipa`, executables
       are **not** tracked: `git ls-files | Select-String "build/|\.apk|\.aab|\.ipa"`.
 - [ ] Default Flutter `.gitignore` present, covering `build/` and `.dart_tool/`.
-- [ ] No private credentials tracked — only the public Supabase anon key
-      (public by design, protected by RLS).
+- [ ] No private credentials tracked — only the public Supabase publishable
+      key (public by design, protected by RLS).
 - [ ] Repository public: `gh repo view gaboliveira-alt/pmob_aval2 --json visibility`.
 
 ## 5. Final smoke test (run before declaring done)

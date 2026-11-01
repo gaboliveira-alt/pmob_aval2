@@ -20,13 +20,10 @@ import '../../domain/models/found_item.dart';
 import '../../domain/models/item_situation.dart';
 import '../../domain/repositories/item_repository.dart';
 
-/// State of the listing (RF04).
 enum ItemsStatus { initial, loading, loaded, error }
 
-/// State of the form submission (RF04).
 enum SubmitStatus { idle, submitting, success, error }
 
-/// Single source of truth for the screens: list + submission.
 class ItemsController extends ChangeNotifier {
   ItemsController({required ItemRepository repository}) : _repository = repository;
 
@@ -41,7 +38,6 @@ class ItemsController extends ChangeNotifier {
   bool get isSubmitting => submitStatus == SubmitStatus.submitting;
   bool get isLoading => status == ItemsStatus.loading;
 
-  /// Loads (or reloads) records from the cloud (RF01, RF03).
   Future<void> loadItems() async {
     status = ItemsStatus.loading;
     notifyListeners();
@@ -50,8 +46,6 @@ class ItemsController extends ChangeNotifier {
       errorMessage = null;
       status = ItemsStatus.loaded;
     } catch (_) {
-      // Keep already-loaded items when a refresh fails;
-      // only show the error screen when there is nothing to display.
       status = items.isEmpty ? ItemsStatus.error : ItemsStatus.loaded;
       errorMessage =
           'Não foi possível carregar os registros. Verifique sua conexão e tente novamente.';
@@ -59,10 +53,6 @@ class ItemsController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Validates and submits a new record. Returns `true` on success.
-  ///
-  /// Rules (RF03): ignores submission while one is in flight;
-  /// captures failures and exposes a comprehensible message for retry.
   Future<bool> submitItem({
     required String name,
     required String description,
@@ -86,7 +76,7 @@ class ItemsController extends ChangeNotifier {
       await _repository.addItem(item);
       submitStatus = SubmitStatus.success;
       notifyListeners();
-      await loadItems(); // RF02: the new record shows up in the listing
+      await loadItems();
       return true;
     } catch (_) {
       submitStatus = SubmitStatus.error;
@@ -97,7 +87,6 @@ class ItemsController extends ChangeNotifier {
     }
   }
 
-  /// Returns the form state to idle after the user has seen the result.
   void resetSubmitStatus() {
     if (submitStatus != SubmitStatus.submitting) {
       submitStatus = SubmitStatus.idle;

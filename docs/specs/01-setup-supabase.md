@@ -15,7 +15,8 @@ created and the client initialized. No fictitious data may exist in code
 1. Create a free account at <https://supabase.com> → **New project** (Free plan).
 2. In **Settings → API**, note:
    - `Project URL` (format `https://XXXXXXXX.supabase.co`)
-   - `anon public key` (public key; safe for the app because RLS restricts
+   - `Publishable key` (format `sb_publishable_...`; formerly called `anon
+     key` — public key by design; safe for the app because RLS restricts
      access to SELECT/INSERT only — no editing, no deletion, no sensitive data)
 3. In the **SQL Editor**, paste and run the **entire** content of
    [`docs/supabase/schema.sql`](../supabase/schema.sql).
@@ -33,10 +34,10 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-  provider: ^6.1.2
-  supabase_flutter: ^2.8.0
   flutter_localizations:
     sdk: flutter
+  provider: ^6.1.5+1
+  supabase_flutter: ^2.18.3
 ```
 
 Run `flutter pub get` after editing.
@@ -46,21 +47,18 @@ Run `flutter pub get` after editing.
 Create `lib/config/supabase_config.dart`:
 
 ```dart
-/// Public Supabase configuration.
-///
-/// The `anon key` is a public key by design: the database is protected by RLS
-/// that allows only SELECT and INSERT (no authentication, no sensitive data).
-/// These values are also documented in the README (item 8.2 of the assignment).
 abstract final class SupabaseConfig {
-  /// Replace with the real values from Settings → API of the Supabase project.
   static const String url = 'SUBSTITUA_PELA_URL_DO_PROJETO_SUPABASE';
-  static const String anonKey = 'SUBSTITUA_PELA_ANON_KEY_DO_PROJETO_SUPABASE';
+
+  static const String publishKey =
+      'SUBSTITUA_PELA_PUBLISHABLE_KEY_DO_PROJETO_SUPABASE';
 }
 ```
 
-- The team fills in the real values (`https://....supabase.co` and the anon
-  key) as soon as the Supabase project exists. They **must** live in this file
-  (the app must compile straight from the repository, per checklist 8.3).
+- The team fills in the real values (`https://....supabase.co` and the
+  publishable key) as soon as the Supabase project exists. They **must** live
+  in this file (the app must compile straight from the repository, per
+  checklist 8.3).
 
 ## 4. Entry point (`lib/main.dart`)
 
@@ -77,7 +75,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(
     url: SupabaseConfig.url,
-    anonKey: SupabaseConfig.anonKey,
+    publishableKey: SupabaseConfig.publishKey,
   );
   runApp(const App());
 }
@@ -107,6 +105,6 @@ supportedLocales: const [Locale('pt', 'BR')],
 - [ ] `flutter pub get` runs without error.
 - [ ] `Supabase.initialize` is called before `runApp`.
 - [ ] The schema was executed on Supabase and table `public.items` exists.
-- [ ] `SupabaseConfig.url` and `.anonKey` contain (or are ready to receive) the real values.
+- [ ] `SupabaseConfig.url` and `.publishKey` contain (or are ready to receive) the real values.
 - [ ] `App` uses Material 3 and `Locale('pt', 'BR')`.
 - [ ] `flutter analyze` clean and `dart format .` applied.

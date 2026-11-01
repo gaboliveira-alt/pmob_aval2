@@ -43,20 +43,56 @@ lost/found objects and browse the listing. Data lives in **Supabase**
    flutter analyze   # must print "No issues found!"
    ```
    The project must always be left in this state.
+7. **Comments in code are strictly prohibited** — no comments of any kind in
+   `.dart` files (`//`, `///`, `/* */`), not even explanatory or documentation
+   comments. Express intent through expressive names; documentation belongs in
+   the `README.md` and in `docs/`, never in the code.
 
 ## Repository rules (sections 7/8 of the assignment)
 
 - **Never** commit build artifacts: `build/`, `.dart_tool/`, `*.apk`,
   `*.aab`, `*.ipa`, executables. The default Flutter `.gitignore` already
   covers this; do not weaken it.
-- **Never** commit private credentials. The Supabase `anon key` is public by
-  design (database protected by RLS) and **must** live in
-  `lib/config/supabase_config.dart` + be documented in the README
-  (requirement 8.2).
-- Commits in Portuguese, format `type: short description`
+- **Never** commit private credentials. The Supabase `publishable key`
+  (formerly `anon key`) is public by design (database protected by RLS) and
+  **must** live in `lib/config/supabase_config.dart` + be documented in the
+  README (requirement 8.2).
+- Commit messages in English, format `type: short description`
   (e.g. `feat: add item list screen with retry`), one per logical unit of
   work; every team member must have identifiable commits.
 - Update `README.md` whenever configuration, structure or dependencies change.
+
+## Git workflow — one branch per spec/feature
+
+Each stage is developed in its own branch and only reaches `main` through a
+Pull Request after its issue checklist passes. **Never push stage work
+directly to `main`** — it must always stay functional and runnable.
+
+1. **Branch naming:** `feature/NN-nome-da-spec`, using the spec number and
+   file stem — branch, spec and issue share the same `NN`:
+   - spec `docs/specs/01-setup-supabase.md` → issue `#1` → branch
+     `feature/01-setup-supabase`
+2. **Start a stage** by branching off an up-to-date `main`:
+
+   ```bash
+   git checkout main && git pull
+   git checkout -b feature/01-setup-supabase
+   ```
+
+3. **Commit only to that branch**, following the commit format in this file
+   (one commit per logical unit of work).
+4. **When the stage is done**, run the gate: `dart format .` +
+   `flutter analyze` + the stage's smoke test. Then open a PR from the
+   feature branch to `main` with:
+   - **Title:** the issue title (e.g. `Etapa 1 — Configurar Supabase...`);
+   - **Description:** paste the spec's "Acceptance criteria" checklist with
+     every item ticked `[x]`, and tick the same checklist in the issue;
+   - **`Closes #N`** in the body, so the issue auto-closes on merge.
+5. **Merge only when every checklist item passes.** Delete the branch after
+   the merge (GitHub's "Delete branch" option).
+6. Stages are merged in order (1 → 2 → 3 → 4 → 5 → 6). If a later branch
+   conflicts, rebase/merge `main` into the feature branch — never the other
+   way around.
 
 ## Workflow with the specs
 
