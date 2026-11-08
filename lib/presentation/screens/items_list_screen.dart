@@ -19,15 +19,7 @@ final class ItemsListScreen extends StatelessWidget {
           IconButton(
             onPressed: controller.isLoading
                 ? null
-                : () async {
-                    await controller.loadItems();
-                    final message = controller.errorMessage;
-                    if (message != null && context.mounted) {
-                      ScaffoldMessenger.of(context)
-                        ..hideCurrentSnackBar()
-                        ..showSnackBar(SnackBar(content: Text(message)));
-                    }
-                  },
+                : () => _refresh(context, controller),
             tooltip: 'Atualizar',
             icon: const Icon(Icons.refresh),
           ),
@@ -44,73 +36,122 @@ final class ItemsListScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _refresh(
+    BuildContext context,
+    ItemsController controller,
+  ) async {
+    await controller.loadItems();
+    final message = controller.errorMessage;
+    if (message != null && context.mounted) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(message)));
+    }
+  }
+
   Widget _buildBody(BuildContext context, ItemsController controller) {
     return switch (controller.status) {
       ItemsStatus.initial || ItemsStatus.loading => const Center(
           child: CircularProgressIndicator(),
         ),
-      ItemsStatus.error => Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.cloud_off,
-                  size: 64,
-                  color: Theme.of(context).colorScheme.error,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  controller.errorMessage ??
-                      'Não foi possível carregar os registros.',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton.icon(
-                  onPressed: controller.loadItems,
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Tentar novamente'),
-                ),
-              ],
-            ),
-          ),
+      ItemsStatus.error => _ErrorStateView(
+          message: controller.errorMessage ??
+              'Não foi possível carregar os registros.',
+          onRetry: controller.loadItems,
         ),
-      ItemsStatus.loaded when controller.items.isEmpty => Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.inbox_outlined,
-                  size: 64,
-                  color: Theme.of(context).colorScheme.outline,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Nenhum registro ainda.',
-                  style: Theme.of(context).textTheme.titleMedium,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Cadastre um objeto perdido ou encontrado.',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
+      ItemsStatus.loaded when controller.items.isEmpty =>
+        const _EmptyStateView(),
+      ItemsStatus.loaded => RefreshIndicator(
+          onRefresh: () => _refresh(context, controller),
+          child: ListView.separated(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(16),
+            itemCount: controller.items.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            itemBuilder: (context, index) =>
+                ItemCard(item: controller.items[index]),
           ),
-        ),
-      ItemsStatus.loaded => ListView.separated(
-          padding: const EdgeInsets.all(16),
-          itemCount: controller.items.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 12),
-          itemBuilder: (context, index) =>
-              ItemCard(item: controller.items[index]),
         ),
     };
+  }
+}
+
+final class _ErrorStateView extends StatelessWidget {
+  const _ErrorStateView({
+    required this.message,
+    required this.onRetry,
+  });
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.cloud_off,
+              size: 64,
+              color: theme.colorScheme.error,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyLarge,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Tentar novamente'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+final class _EmptyStateView extends StatelessWidget {
+  const _EmptyStateView();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.inbox_outlined,
+              size: 64,
+              color: theme.colorScheme.outline,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Nenhum registro ainda.',
+              style: theme.textTheme.titleMedium,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Cadastre um objeto perdido ou encontrado.',
+              style: theme.textTheme.bodyMedium,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
