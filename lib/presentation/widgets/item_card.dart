@@ -24,7 +24,9 @@ final class ItemCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     item.name,
-                    style: theme.textTheme.titleMedium,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
