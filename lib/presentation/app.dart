@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../data/repositories/supabase_item_repository.dart';
 import 'controllers/items_controller.dart';
+import 'screens/items_list_screen.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -21,17 +22,8 @@ class App extends StatelessWidget {
         ),
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
         supportedLocales: const [Locale('pt', 'BR')],
-        home: const _HomePlaceholder(),
+        home: const ItemsListScreen(),
       ),
     );
-  }
-}
-
-class _HomePlaceholder extends StatelessWidget {
-  const _HomePlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: CircularProgressIndicator()));
   }
 }
