@@ -9,60 +9,69 @@ Aplicativo móvel em Flutter para divulgação e consulta de objetos perdidos e 
 
 ## Funcionalidades
 
-- **Listagem de objetos**
-  - Dados obtidos da nuvem;
-  - Identificação visual da situação (perdido/encontrado);
-  - Ordenação pelos itens mais recentes primeiro;
-  - Atualização da listagem.
-- **Cadastro de objetos**
-  - Nome (até 60 caracteres) e descrição (até 200 caracteres);
-  - Local e situação (perdido/encontrado);
-  - Validação dos campos preenchidos;
-  - Data e hora preenchidas automaticamente.
-- **Assincronismo**
-  - Indicadores de carregamento;
-  - Prevenção de envios repetidos;
-  - Tratamento de erros com opção de nova tentativa.
-- **Gerenciamento de estado**
-  - Organização e reatividade dos dados exibidos na interface.
-- **Armazenamento em nuvem**
-  - Serviço gratuito, sem necessidade de autenticação.
+- **Listagem de objetos (RF01)**
+  - Dados obtidos diretamente da nuvem em tempo real;
+  - Identificação visual imediata da situação (Perdido em vermelho / Encontrado em verde);
+  - Ordenação automática pelos registros mais recentes primeiro (`created_at DESC`);
+  - Atualização manual por botão na barra superior (`AppBar`) e suporte a gesto *pull-to-refresh*.
+- **Cadastro de objetos (RF02)**
+  - Formulário com campos para nome (até 60 caracteres), descrição (até 200 caracteres), local e situação (Perdido / Encontrado);
+  - Validação estrita de todos os campos com feedback interativo (`AutovalidateMode.onUserInteraction`);
+  - Data e hora registradas automaticamente pelo servidor (`now()`), eliminando inconsistências.
+- **Assincronismo e Resiliência (RF03)**
+  - Indicadores visuais de carregamento (`CircularProgressIndicator`);
+  - Bloqueio de submissão dupla durante o envio para evitar duplicação de dados;
+  - Tratamento de falhas de conexão com mensagens amigáveis e botão para nova tentativa ("Tentar novamente").
+- **Gerenciamento de Estado (RF04)**
+  - Arquitetura reativa baseada em `ChangeNotifier` + `Provider` centralizada no `ItemsController`.
+- **Persistência em Nuvem (RF05)**
+  - Banco de dados PostgreSQL hospedado no Supabase (plano gratuito), sem necessidade de autenticação.
 
-## Serviços em nuvem
+## Serviços em Nuvem
 
-- **Supabase** (plano gratuito, sem autenticação) — tabela `public.items` com
-  políticas de RLS que permitem apenas `SELECT` e `INSERT` para o papel `anon`.
-- A URL do projeto e a `publishable key` (chave pública por design — a antiga
-  `anon key`) ficam em
-  [`lib/config/supabase_config.dart`](lib/config/supabase_config.dart) e são
-  obtidas em **Settings → API** do painel do Supabase (item 8.2 do edital).
-- O schema do banco está em [`docs/supabase/schema.sql`](docs/supabase/schema.sql)
-  e deve ser executado no **SQL Editor** do Supabase.
+- **Supabase** (plano gratuito, sem autenticação) — tabela `public.items` com políticas de Row Level Security (RLS) que permitem estritamente operações de `SELECT` e `INSERT` para o papel público (`anon`).
+- A URL do projeto e a `publishable key` (chave pública por design, protegida por RLS — item 8.2 do edital) estão configuradas em [`lib/config/supabase_config.dart`](lib/config/supabase_config.dart).
+- O script SQL de criação da tabela, restrições e políticas de RLS encontra-se em [`docs/supabase/schema.sql`](docs/supabase/schema.sql).
 
-## Como executar
+## Como Executar
 
 ### Pré-requisitos
 
-- [SDK Flutter](https://docs.flutter.dev/get-started/install) instalado e configurado.
+- [SDK Flutter](https://docs.flutter.dev/get-started/install) instalado e configurado (versão 3.x ou superior com suporte a Web).
+- Navegador Google Chrome.
 
-### Passos
+### Passos para Execução
 
-```bash
-flutter pub get
-flutter run -d chrome
-```
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/gaboliveira-alt/pmob_aval2.git
+   cd pmob_aval2
+   ```
 
-> Antes de executar, preencha `url` e `publishKey` em
-> [`lib/config/supabase_config.dart`](lib/config/supabase_config.dart) com os
-> valores reais do projeto Supabase (**Settings → API**).
+2. Instale as dependências:
+   ```bash
+   flutter pub get
+   ```
 
-## Estrutura do projeto
+3. Execute a aplicação no Chrome:
+   ```bash
+   flutter run -d chrome
+   ```
 
-O projeto segue uma arquitetura em camadas, organizada sob `lib/`:
+> As credenciais públicas de acesso ao Supabase já estão previamente configuradas em `lib/config/supabase_config.dart`, permitindo que o projeto execute e compile imediatamente após o clone.
 
-- **domain**: regras de negócio e modelos dos dados;
-- **presentation**: widgets e telas que exibem a informação ao usuário.
+## Estrutura do Projeto
+
+O código-fonte segue arquitetura em camadas bem definida sob o diretório `lib/`:
+
+- **`config/`**: Configurações de ambiente e credenciais públicas da nuvem (`supabase_config.dart`);
+- **`data/`**: Implementações concretas de acesso a dados (`supabase_item_repository.dart`);
+- **`domain/`**: Modelos de domínio puros (`found_item.dart`, `item_situation.dart`) e contratos abstratos de repositório (`item_repository.dart`);
+- **`presentation/`**:
+  - **`controllers/`**: Gerenciador de estado reativo da aplicação (`items_controller.dart`);
+  - **`screens/`**: Telas principais da aplicação (`items_list_screen.dart`, `register_item_screen.dart`);
+  - **`widgets/`**: Componentes visuais reutilizáveis (`item_card.dart`, `situation_badge.dart`).
 
 ---
 
-UESPI — Programação para Dispositivos Móveis
+UESPI — Programação para Dispositivos Móveis (2ª Avaliação)
